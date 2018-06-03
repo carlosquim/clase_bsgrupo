@@ -1,0 +1,66 @@
+---
+title: "Reporte de Clase"
+author: "David Lopez"
+date: "2 de junio de 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(plotly)
+library(corrplot)
+library(gridExtra)
+library(kernlab)
+set.seed(984651312)
+
+```
+
+## Agenda
+
+- Antecedentes
+- Análisis Exploratorio
+- Modelado
+- Resultados
+
+## Antecedentes
+
+El dataset de Iris contiene las mediciones de longitud y anchura de los pétalos y sépalos correspondiente a tres distintas especies.
+
+Ha sido utilizado como referente en cursos de Ciencia de Datos.
+
+## Análisis Exploratorio
+
+### Correlaciones
+
+```{r,echo = F}
+corrplot(cor(iris[,-5]))
+```
+
+## Análisis Exploratorio
+
+### Distribución
+
+```{r,echo = F}
+g.pl <- ggplot(iris) + geom_histogram(aes(x=Petal.Length),fill='#7777ff',binwidth = .03) + 
+facet_grid(Species ~ .)
+g.pw <- ggplot(iris) + geom_histogram(aes(x=Petal.Width),fill='#7777ff',binwidth = .03) + facet_grid(Species ~ .)
+g.sl <- ggplot(iris) + geom_histogram(aes(x=Sepal.Length),fill='#7777ff',binwidth = .03) + 
+facet_grid(Species ~ .)
+g.sw <- ggplot(iris) + geom_histogram(aes(x=Sepal.Width),fill='#7777ff',binwidth = .03) + facet_grid(Species ~ .)
+gridExtra::grid.arrange(g.pl,g.pw,g.sl,g.sw)
+```
+
+
+## Modelado
+
+### kPCA y Clustering
+```{r,echo = F}
+iris.kpc <- kpca(~.,data=iris[,-5],kernel="rbfdot",kpar=list(sigma=0.2),features=2)
+iris.kpca <- data.frame(cp1=iris.kpc@pcv[,1],cp2=iris.kpc@pcv[,2],Species=iris[,5])
+ggplot(iris.kpca) + geom_point(aes(x=cp1,y=cp2,color=Species,size=1.1),alpha=.7)
+
+```
+
+
